@@ -1,15 +1,98 @@
-<script>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三麻点数計算</title>
+<style>
+body{
+  font-family:sans-serif;
+  text-align:center;
+  background:#111;
+  color:white;
+  margin:0;
+  padding:10px;
+}
+h1{
+  font-size:20px;
+}
+button{
+  font-size:18px;
+  padding:12px;
+  margin:4px;
+  border-radius:8px;
+  border:none;
+  width:28%;
+  min-width:80px;
+}
+.normal{
+  background:#333;
+  color:white;
+}
+.select{
+  background:#4CAF50;
+  color:white;
+}
+#result{
+  font-size:28px;
+  margin-top:20px;
+  font-weight:bold;
+}
+.grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.han{
+  width:30%;
+}
+</style>
+</head>
+<body>
 
+<h1>三麻 点数計算</h1>
+
+<!-- ロン/ツモ -->
+<div>
+  <button id="ronBtn" class="normal">ロン</button>
+  <button id="tsumoBtn" class="normal">ツモ</button>
+</div>
+
+<!-- 子/親 -->
+<div>
+  <button id="koBtn" class="normal">子</button>
+  <button id="oyaBtn" class="normal">親</button>
+</div>
+
+<!-- ハン数 -->
+<div class="grid">
+  <button class="han normal">1</button>
+  <button class="han normal">2</button>
+  <button class="han normal">3</button>
+  <button class="han normal">4-5</button>
+  <button class="han normal">6-7</button>
+  <button class="han normal">8-9-10</button>
+  <button class="han normal">11-12</button>
+  <button class="han normal">13+</button>
+</div>
+
+<!-- 結果表示 -->
+<div id="result">1000</div>
+
+<script>
+// --- 状態管理 ---
 let winType = "ロン";
 let player = "子";
 let han = "1";
 
+// --- ボタン取得 ---
 const ronBtn = document.getElementById("ronBtn");
 const tsumoBtn = document.getElementById("tsumoBtn");
 const koBtn = document.getElementById("koBtn");
 const oyaBtn = document.getElementById("oyaBtn");
 const hanButtons = document.querySelectorAll(".han");
 
+// --- スコアテーブル ---
 const scoreTable = {
   "ロン": {
     "子": ["1000","2000","4000","8000","12000","16000","24000","32000"],
@@ -21,23 +104,17 @@ const scoreTable = {
   }
 };
 
+// --- スコア更新 ---
 function updateScore(){
   const hanIndexMap = {
-    "1":0,
-    "2":1,
-    "3":2,
-    "4-5":3,
-    "6-7":4,
-    "8-9-10":5,
-    "11-12":6,
-    "13+":7
+    "1":0, "2":1, "3":2, "4-5":3, "6-7":4, "8-9-10":5, "11-12":6, "13+":7
   };
-
   const index = hanIndexMap[han];
   document.getElementById("result").innerText =
     scoreTable[winType][player][index];
 }
 
+// --- グループごとの色管理 ---
 function setActive(group, active){
   group.forEach(btn=>{
     btn.classList.remove("select");
@@ -47,45 +124,47 @@ function setActive(group, active){
   active.classList.remove("normal");
 }
 
-/* --- ロン/ツモ --- */
+// --- ロン/ツモ ---
+const ronTsumoGroup = [ronBtn, tsumoBtn];
 ronBtn.addEventListener("click",()=>{
   winType="ロン";
-  setActive([ronBtn,tsumoBtn], ronBtn);
+  setActive(ronTsumoGroup, ronBtn);
   updateScore();
 });
-
 tsumoBtn.addEventListener("click",()=>{
   winType="ツモ";
-  setActive([ronBtn,tsumoBtn], tsumoBtn);
+  setActive(ronTsumoGroup, tsumoBtn);
   updateScore();
 });
 
-/* --- 子/親 --- */
+// --- 子/親 ---
+const koOyaGroup = [koBtn, oyaBtn];
 koBtn.addEventListener("click",()=>{
   player="子";
-  setActive([koBtn,oyaBtn], koBtn);
+  setActive(koOyaGroup, koBtn);
   updateScore();
 });
-
 oyaBtn.addEventListener("click",()=>{
   player="親";
-  setActive([koBtn,oyaBtn], oyaBtn);
+  setActive(koOyaGroup, oyaBtn);
   updateScore();
 });
 
-/* --- ハン数 --- */
+// --- ハン数 ---
 hanButtons.forEach(btn=>{
   btn.addEventListener("click",()=>{
-    han = btn.innerText;
+    han = btn.textContent.trim();
     setActive(hanButtons, btn);
     updateScore();
   });
 });
 
-/* --- 初期状態 --- */
-setActive([ronBtn,tsumoBtn], ronBtn);
-setActive([koBtn,oyaBtn], koBtn);
+// --- 初期状態 ---
+setActive(ronTsumoGroup, ronBtn);
+setActive(koOyaGroup, koBtn);
 setActive(hanButtons, hanButtons[0]);
 updateScore();
 
 </script>
+</body>
+</html>
