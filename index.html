@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>三麻点数計算</title>
+<style>
+body{
+  font-family: sans-serif;
+  text-align:center;
+  background:#111;
+  color:white;
+  margin:0;
+  padding:10px;
+}
+h1{
+  font-size:20px;
+}
+button{
+  font-size:18px;
+  padding:12px;
+  margin:4px;
+  border-radius:8px;
+  border:none;
+  width:28%;
+}
+.select{
+  background:#4CAF50;
+  color:white;
+}
+.normal{
+  background:#333;
+  color:white;
+}
+#result{
+  font-size:28px;
+  margin-top:20px;
+  font-weight:bold;
+}
+.grid{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.han{
+  width:30%;
+}
+</style>
+</head>
+<body>
+
+<h1>三麻 点数計算</h1>
+
+<div>
+  <button id="ronBtn">ロン</button>
+  <button id="tsumoBtn">ツモ</button>
+</div>
+
+<div>
+  <button id="koBtn">子</button>
+  <button id="oyaBtn">親</button>
+</div>
+
+<div class="grid">
+  <button class="han">1</button>
+  <button class="han">2</button>
+  <button class="han">3</button>
+  <button class="han">4-5</button>
+  <button class="han">6-7</button>
+  <button class="han">8-9-10</button>
+  <button class="han">11-12</button>
+  <button class="han">13+</button>
+</div>
+
+<div id="result">1000</div>
+
+<script>
+
+let winType = "ロン";
+let player = "子";
+let han = "1";
+
+const scoreTable = {
+  "ロン": {
+    "子": ["1000","2000","4000","8000","12000","16000","24000","32000"],
+    "親": ["1500","3000","6000","12000","18000","24000","36000","48000"]
+  },
+  "ツモ": {
+    "子": ["1000A","1000A","1000/3000","3000/5000","4000/8000","6000/10000","8000/16000","10000/22000"],
+    "親": ["1000A","2000A","3000A","6000A","9000A","12000A","18000A","24000A"]
+  }
+};
+
+function updateScore(){
+  const hanIndex = {
+    "1":0,
+    "2":1,
+    "3":2,
+    "4-5":3,
+    "6-7":4,
+    "8-9-10":5,
+    "11-12":6,
+    "13+":7
+  }[han];
+
+  document.getElementById("result").innerText =
+    scoreTable[winType][player][hanIndex];
+}
+
+function selectButton(buttons, activeBtn){
+  buttons.forEach(btn=>{
+    btn.classList.remove("select");
+    btn.classList.add("normal");
+  });
+  activeBtn.classList.add("select");
+}
+
+document.getElementById("ronBtn").onclick = function(){
+  winType="ロン";
+  selectButton([ronBtn,tsumoBtn],this);
+  updateScore();
+};
+document.getElementById("tsumoBtn").onclick = function(){
+  winType="ツモ";
+  selectButton([ronBtn,tsumoBtn],this);
+  updateScore();
+};
+
+document.getElementById("koBtn").onclick = function(){
+  player="子";
+  selectButton([koBtn,oyaBtn],this);
+  updateScore();
+};
+document.getElementById("oyaBtn").onclick = function(){
+  player="親";
+  selectButton([koBtn,oyaBtn],this);
+  updateScore();
+};
+
+document.querySelectorAll(".han").forEach(btn=>{
+  btn.onclick=function(){
+    han=this.innerText;
+    document.querySelectorAll(".han").forEach(b=>b.classList.remove("select"));
+    this.classList.add("select");
+    updateScore();
+  }
+});
+
+// 初期状態
+ronBtn.classList.add("select");
+koBtn.classList.add("select");
+document.querySelectorAll(".han")[0].classList.add("select");
+updateScore();
+
+</script>
+
+</body>
+</html>
