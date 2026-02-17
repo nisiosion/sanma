@@ -1,84 +1,14 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>三麻点数計算</title>
-<style>
-body{
-  font-family: sans-serif;
-  text-align:center;
-  background:#111;
-  color:white;
-  margin:0;
-  padding:10px;
-}
-h1{
-  font-size:20px;
-}
-button{
-  font-size:18px;
-  padding:12px;
-  margin:4px;
-  border-radius:8px;
-  border:none;
-  width:28%;
-}
-.select{
-  background:#4CAF50;
-  color:white;
-}
-.normal{
-  background:#333;
-  color:white;
-}
-#result{
-  font-size:28px;
-  margin-top:20px;
-  font-weight:bold;
-}
-.grid{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-}
-.han{
-  width:30%;
-}
-</style>
-</head>
-<body>
-
-<h1>三麻 点数計算</h1>
-
-<div>
-  <button id="ronBtn">ロン</button>
-  <button id="tsumoBtn">ツモ</button>
-</div>
-
-<div>
-  <button id="koBtn">子</button>
-  <button id="oyaBtn">親</button>
-</div>
-
-<div class="grid">
-  <button class="han">1</button>
-  <button class="han">2</button>
-  <button class="han">3</button>
-  <button class="han">4-5</button>
-  <button class="han">6-7</button>
-  <button class="han">8-9-10</button>
-  <button class="han">11-12</button>
-  <button class="han">13+</button>
-</div>
-
-<div id="result">1000</div>
-
 <script>
 
 let winType = "ロン";
 let player = "子";
 let han = "1";
+
+const ronBtn = document.getElementById("ronBtn");
+const tsumoBtn = document.getElementById("tsumoBtn");
+const koBtn = document.getElementById("koBtn");
+const oyaBtn = document.getElementById("oyaBtn");
+const hanButtons = document.querySelectorAll(".han");
 
 const scoreTable = {
   "ロン": {
@@ -92,7 +22,7 @@ const scoreTable = {
 };
 
 function updateScore(){
-  const hanIndex = {
+  const hanIndexMap = {
     "1":0,
     "2":1,
     "3":2,
@@ -101,58 +31,61 @@ function updateScore(){
     "8-9-10":5,
     "11-12":6,
     "13+":7
-  }[han];
+  };
 
+  const index = hanIndexMap[han];
   document.getElementById("result").innerText =
-    scoreTable[winType][player][hanIndex];
+    scoreTable[winType][player][index];
 }
 
-function selectButton(buttons, activeBtn){
-  buttons.forEach(btn=>{
+function setActive(group, active){
+  group.forEach(btn=>{
     btn.classList.remove("select");
     btn.classList.add("normal");
   });
-  activeBtn.classList.add("select");
+  active.classList.add("select");
+  active.classList.remove("normal");
 }
 
-document.getElementById("ronBtn").onclick = function(){
+/* --- ロン/ツモ --- */
+ronBtn.addEventListener("click",()=>{
   winType="ロン";
-  selectButton([ronBtn,tsumoBtn],this);
+  setActive([ronBtn,tsumoBtn], ronBtn);
   updateScore();
-};
-document.getElementById("tsumoBtn").onclick = function(){
-  winType="ツモ";
-  selectButton([ronBtn,tsumoBtn],this);
-  updateScore();
-};
-
-document.getElementById("koBtn").onclick = function(){
-  player="子";
-  selectButton([koBtn,oyaBtn],this);
-  updateScore();
-};
-document.getElementById("oyaBtn").onclick = function(){
-  player="親";
-  selectButton([koBtn,oyaBtn],this);
-  updateScore();
-};
-
-document.querySelectorAll(".han").forEach(btn=>{
-  btn.onclick=function(){
-    han=this.innerText;
-    document.querySelectorAll(".han").forEach(b=>b.classList.remove("select"));
-    this.classList.add("select");
-    updateScore();
-  }
 });
 
-// 初期状態
-ronBtn.classList.add("select");
-koBtn.classList.add("select");
-document.querySelectorAll(".han")[0].classList.add("select");
+tsumoBtn.addEventListener("click",()=>{
+  winType="ツモ";
+  setActive([ronBtn,tsumoBtn], tsumoBtn);
+  updateScore();
+});
+
+/* --- 子/親 --- */
+koBtn.addEventListener("click",()=>{
+  player="子";
+  setActive([koBtn,oyaBtn], koBtn);
+  updateScore();
+});
+
+oyaBtn.addEventListener("click",()=>{
+  player="親";
+  setActive([koBtn,oyaBtn], oyaBtn);
+  updateScore();
+});
+
+/* --- ハン数 --- */
+hanButtons.forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    han = btn.innerText;
+    setActive(hanButtons, btn);
+    updateScore();
+  });
+});
+
+/* --- 初期状態 --- */
+setActive([ronBtn,tsumoBtn], ronBtn);
+setActive([koBtn,oyaBtn], koBtn);
+setActive(hanButtons, hanButtons[0]);
 updateScore();
 
 </script>
-
-</body>
-</html>
